@@ -1,6 +1,6 @@
-const CACHE='trainer-max-v2';
+const CACHE='trainer-max-v3';
 const FILES=["Trainer_Max_Krafttraining.html", "app.js", "apple-touch-icon.png", "athletes-banner.jpg", "finish-photo.jpg", "i18n.js", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "index.html", "manifest.webmanifest", "outdoor.html", "running.html", "style.css", "theme.css", "treadmill.html", "workouts.js", "sw.js"];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(f=>'./'+f))).then(()=>self.skipWaiting()))});
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(f=>new Request('./'+f,{cache:'reload'})))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin)return;
  // Seiten: zuerst Netz (für Updates), sonst Speicher. Sonstiges: zuerst Speicher.
