@@ -4,7 +4,7 @@ const PHOTO='finish-photo.jpg';
 const $=id=>document.getElementById(id);let state='idle',watch=null,started=0,elapsed=0,ticker=null,points=[],total=0,finalBlob=null,finalURL=null;
 const fmt=n=>n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
 function clock(s){s=Math.max(0,Math.floor(s));return (s>=3600?String(Math.floor(s/3600)).padStart(2,'0')+':':'')+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function say(t){if(!$('voice').checked||!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(window.I18n?I18n.t(t):t);u.lang=window.I18n?I18n.locale:'ru-RU';u.rate=.9;speechSynthesis.speak(u)}
+function say(t){if(!$('voice').checked||!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(window.I18n?I18n.t(t):t);u.lang=window.I18n?I18n.locale:'ru-RU';u.rate=.9;const mv=window.TrainerVoice&&TrainerVoice.pick();if(mv){u.voice=mv;u.lang=mv.lang}speechSynthesis.speak(u)}
 function hav(a,b){let r=Math.PI/180,dlat=(b.lat-a.lat)*r,dlon=(b.lon-a.lon)*r,x=Math.sin(dlat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dlon/2)**2;return 6371000*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function update(){let s=state==='running'?(Date.now()-started)/1000:elapsed;$('time').textContent=clock(s);$('distance').textContent=fmt(total/1000)+' km';$('speed').textContent=(s>0?(total/1000)/(s/3600):0).toFixed(1).replace('.',',')+' km/h';$('pace').textContent=total>0?clock(s/(total/1000))+' /km':'–'}
 const KEY='trainer-max-outdoor-v2';
