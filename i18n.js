@@ -26,3 +26,27 @@ for(const name of ['alert','confirm']){const original=window[name]?.bind(window)
 function boot(){const bar=document.createElement('nav');bar.className='language-switch';bar.setAttribute('aria-label','Язык / Sprache');bar.dataset.noTranslate='';bar.innerHTML='<button type="button" data-language="ru">Русский</button><button type="button" data-language="de">Deutsch</button>';bar.querySelectorAll('button').forEach(b=>b.onclick=()=>setLanguage(b.dataset.language));document.body.prepend(bar);observer=new MutationObserver(apply);apply();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+
+/* Trainer Max ist ein Mann: männliche Systemstimme bevorzugen. */
+(function(){
+ var MALE={de:['martin','markus','yannick','viktor','conrad','stefan','killian','florian','jonas','ralf','bernd','hans','helmut','reed','eddy','rocko','grandpa'],
+           ru:['yuri','юрий','dmitry','дмитрий','pavel','павел','maxim','максим','ivan','иван','artem','артём','eddy','reed','rocko','grandpa']};
+ var NOVELTY=['reed','eddy','rocko','grandpa'];
+ function nm(v){return String((v&&v.name)||'').toLowerCase()}
+ function isMale(v,lang){var n=nm(v);if(/\bmale\b|männlich|мужск/.test(n)&&!/female|weiblich|женск/.test(n))return true;
+  return (MALE[lang]||[]).concat(MALE.de,MALE.ru).some(function(m){return n.indexOf(m)>-1})}
+ function score(v,lang){var n=nm(v),s=0;if(isMale(v,lang))s+=100;else return 0;
+  if(/premium|premium|enhanced|erweitert|улучш/.test(n))s+=20;
+  if(NOVELTY.some(function(m){return n.indexOf(m)>-1}))s-=60;
+  if(v.localService)s+=2;return s}
+ window.TrainerVoice={
+  isMale:function(v,lang){return isMale(v,lang||'ru')},
+  pick:function(lang){lang=lang||(window.I18n?I18n.lang:'ru');if(!('speechSynthesis'in window))return null;
+   var vs=speechSynthesis.getVoices().filter(function(v){return String(v.lang).toLowerCase().indexOf(lang)===0});
+   var best=null,bs=0;vs.forEach(function(v){var s=score(v,lang);if(s>bs){bs=s;best=v}});return best},
+  hint:function(lang){lang=lang||(window.I18n?I18n.lang:'ru');return lang==='de'
+   ?'Keine männliche deutsche Stimme gefunden. iPhone: Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → Deutsch → „Martin“ laden.'
+   :'Мужской русский голос не найден. iPhone: Настройки → Универсальный доступ → Устн. контент → Голоса → Русский → загрузить «Юрий».'}
+ };
+ if('speechSynthesis'in window)try{speechSynthesis.getVoices()}catch(e){}
+})();
